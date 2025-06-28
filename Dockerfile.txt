@@ -1,0 +1,14 @@
+# Use OpenJDK 21 base image
+FROM openjdk:21-jdk-slim
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy your built JAR file into the container
+COPY target/*.jar SpringAi-0.0.1.jar
+
+# Expose port 8080 (or whatever your Spring Boot app uses)
+EXPOSE 8080
+
+# Run the Spring Boot application
+ENTRYPOINT ["java", "-jar", "SpringAi-0.0.1.jar"]

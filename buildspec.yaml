@@ -1,0 +1,30 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto21
+    commands:
+      - echo Installing Maven...
+      - yum install -y maven
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <your-account-id>.dkr.ecr.us-east-1.amazonaws.com
+      - REPOSITORY_URI=054037103447.dkr.ecr.us-east-2.amazonaws.com/spring-ai-app
+      - IMAGE_TAG=latest
+  build:
+    commands:
+      - echo Building the Spring Boot app...
+      - mvn clean package
+      - echo Building Docker image...
+      - docker build -t $REPOSITORY_URI:$IMAGE_TAG .
+  post_build:
+    commands:
+      - echo Pushing the Docker image to ECR...
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo Build completed successfully.
+
+artifacts:
+  files:
+    - target/*.jar
